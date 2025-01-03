@@ -69,7 +69,7 @@ int server_handshake(int to_client) {
   r = read(from_client, buffer, sizeof(buffer));
   printf("9. Server reading ACK: %s.\nComplete handshake\n", buffer);
 
-  
+  //close(to_client);
   return from_client;
 }
 
@@ -116,8 +116,8 @@ int client_handshake(int to_server) {
   }
   printf("8. Client reading SYN_ACK from private pipe: %s\n", buffer);
 
-  remove(pipe_name);
-  printf("8. Client removed private pipe: %s\n", pipe_name);
+  //remove(pipe_name);
+  //printf("8. Client removed private pipe: %s\n", pipe_name);
 
   //client sends ACK to server with WKP
   w = write(to_server, buffer, sizeof(buffer)+1);
@@ -127,7 +127,7 @@ int client_handshake(int to_server) {
   }
   printf("8. Client sent server ACK: %s\n", buffer);
   free(buffer);
-
+  //close(to_server);
   return from_server;
 }
 
@@ -141,6 +141,7 @@ int client_handshake(int to_server) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int server_connect(int from_client) {
-  int to_client  = 0;
+  int to_client = 0;
+  
   return to_client;
 }
