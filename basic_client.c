@@ -2,10 +2,17 @@
 
 int main() {
 
-  int to_server;
-  int from_server;
+  int to_server; //from client
+  int from_server; //to client
 
-  from_server = client_handshake( &to_server );
-  //read a byte to client
-  //write a byte to client
+  from_server = client_handshake( to_server );
+
+  // char buffer[256];
+  // read(from_server, buffer, sizeof(buffer));
+  // printf("client received message: %s\n", buffer);
+  // char response[];
+  // write(to_server, response, sizeof(response));
+  // printf("client sent message: %s\n", response);
+
+  return 0;
 }
