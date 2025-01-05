@@ -21,6 +21,8 @@
 #define MESSAGE 3
 #define EXIT 4
 
+extern int p;
+
 
 int server_handshake(int to_client);
 int client_handshake(int to_server);

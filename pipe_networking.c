@@ -84,6 +84,7 @@ int server_handshake(int to_client) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int client_handshake(int to_server) {
+
   //client makes PP
   char pipe_name[256];
   sprintf(pipe_name, "%d", getpid());
@@ -116,8 +117,8 @@ int client_handshake(int to_server) {
   }
   printf("8. Client reading SYN_ACK from private pipe: %s\n", buffer);
 
-  //remove(pipe_name);
-  //printf("8. Client removed private pipe: %s\n", pipe_name);
+  remove(pipe_name);
+  printf("8. Client removed private pipe: %s\n", pipe_name);
 
   //client sends ACK to server with WKP
   w = write(to_server, buffer, sizeof(buffer)+1);
@@ -127,6 +128,7 @@ int client_handshake(int to_server) {
   }
   printf("8. Client sent server ACK: %s\n", buffer);
   free(buffer);
+  
   //close(to_server);
   return from_server;
 }
