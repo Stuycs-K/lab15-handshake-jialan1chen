@@ -39,9 +39,9 @@ int server_setup() {
 
   returns the file descriptor for the upstream pipe (see server setup).
   =========================*/
-int server_handshake(int to_client) {
-  //server WKP setup
+int server_handshake(int* to_client) {
   char client_name[256];
+  //server WKP setup
   int from_client = server_setup();
 
   //server reads SYN from WKP
@@ -51,14 +51,15 @@ int server_handshake(int to_client) {
     exit(1);
   }
   printf("5. Server reading SYN: %s\n", client_name);
-  
+
   //server opens and writes SYN_ACK to private pipe
-  to_client = open(client_name, O_WRONLY);
+  *to_client = open(client_name, O_WRONLY);
   printf("6. Server connects to private pipe\n");
+
   char buffer[256];
   strcpy(buffer, "SYN_ACK");
 
-  int w = write(to_client, buffer, sizeof(buffer));
+  int w = write(*to_client, buffer, sizeof(buffer));
   if (w==-1) {
     perror("error server writing to private pipe");
     exit(1);
@@ -69,7 +70,6 @@ int server_handshake(int to_client) {
   r = read(from_client, buffer, sizeof(buffer));
   printf("9. Server reading ACK: %s.\nComplete handshake\n", buffer);
 
-  //close(to_client);
   return from_client;
 }
 
@@ -83,7 +83,7 @@ int server_handshake(int to_client) {
 
   returns the file descriptor for the downstream pipe.
   =========================*/
-int client_handshake(int to_server) {
+int client_handshake(int* to_server) {
 
   //client makes PP
   char pipe_name[256];
@@ -95,21 +95,24 @@ int client_handshake(int to_server) {
   printf("3. Client created PP %s\n", pipe_name);
 
   //client opens and writes to WKP
-  to_server = open(WKP, O_WRONLY);
+  *to_server = open(WKP, O_WRONLY);
   printf("3. Client connects to WKP\n");
 
-  int w = write(to_server, pipe_name, sizeof(pipe_name));
+  int w = write(*to_server, pipe_name, sizeof(pipe_name));
   if (w==-1) {
     perror("error client writing to WKP");
     exit(1);
   }
   printf("3. Client wrote to server pid through WKP: %s\n", pipe_name);
-  
+
   //client reads SYN_ACK from PP
   int from_server;
+
   char* buffer; //for SYN_ACK
   buffer = malloc(20);
+
   from_server = open(pipe_name, O_RDONLY);
+  printf("1 Debug: from_server FD = %d\n", from_server);
   int r = read(from_server, buffer, sizeof(buffer));
   if (r==-1) {
     perror("error client reading from private pipe");
@@ -121,15 +124,14 @@ int client_handshake(int to_server) {
   printf("8. Client removed private pipe: %s\n", pipe_name);
 
   //client sends ACK to server with WKP
-  w = write(to_server, buffer, sizeof(buffer)+1);
+  w = write(*to_server, buffer, sizeof(buffer)+1);
   if (w==-1) {
     perror("error client writing back to server");
     exit(1);
   }
   printf("8. Client sent server ACK: %s\n", buffer);
   free(buffer);
-  
-  //close(to_server);
+
   return from_server;
 }
 
@@ -144,6 +146,5 @@ int client_handshake(int to_server) {
   =========================*/
 int server_connect(int from_client) {
   int to_client = 0;
-  
   return to_client;
 }
