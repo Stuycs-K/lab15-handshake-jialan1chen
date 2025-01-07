@@ -42,7 +42,7 @@ void comm(int to_client, int from_client) {
         close(from_client);
         break;
     }
-    //printf("Bytes: %d", bytes);
+    printf("1 Bytes: %d", bytes);
     printf("server sent number: %d\n", num);
     sleep(1);
 

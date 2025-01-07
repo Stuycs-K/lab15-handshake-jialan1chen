@@ -24,9 +24,8 @@ int main() {
     if (bytes = read(from_server, &num, 4)==-1) {
       perror("client reading error");
     }
-    //printf("2 Bytes: %d", bytes);
+    printf("2 Bytes: %d", bytes);
     printf("Client received number: %d\n", num);
-    sleep(1);
   }
 
   return 0;
