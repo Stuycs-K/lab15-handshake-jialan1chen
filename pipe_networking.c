@@ -14,7 +14,7 @@ int server_setup() {
 
   //server makes the WKP
   if (mkfifo(WKP, 0644)==-1) {
-    perror("WKP mkfifo error");
+    //perror("WKP mkfifo error");
     exit(1);
   }
   printf("1. Server created WKP\n");
@@ -56,19 +56,21 @@ int server_handshake(int* to_client) {
   *to_client = open(client_name, O_WRONLY);
   printf("6. Server connects to private pipe\n");
 
-  char buffer[256];
-  strcpy(buffer, "SYN_ACK");
+  //char buffer[256];
+  //strcpy(buffer, "SYN_ACK");
+  int rand_num = 3417;
 
-  int w = write(*to_client, buffer, sizeof(buffer));
+  int w = write(*to_client, &rand_num, sizeof(int));
   if (w==-1) {
     perror("error server writing to private pipe");
     exit(1);
   }
-  printf("7. Server sent SYN_ACK to private pipe\n");
+  printf("7. Server sent SYN_ACK to private pipe: %d\n", rand_num);
 
+  int received_num;
   //server receives the final ACK through PP
-  r = read(from_client, buffer, sizeof(buffer));
-  printf("9. Server reading ACK: %s.\nComplete handshake\n", buffer);
+  r = read(from_client, &received_num, sizeof(int));
+  printf("9. Server reading ACK: %d.\nComplete handshake\n", received_num);
 
   return from_client;
 }
@@ -108,29 +110,31 @@ int client_handshake(int* to_server) {
   //client reads SYN_ACK from PP
   int from_server;
 
-  char* buffer; //for SYN_ACK
-  buffer = malloc(20);
+  // char* buffer; //for SYN_ACK
+  // buffer = malloc(20);
+  int rand_num;
 
   from_server = open(pipe_name, O_RDONLY);
-  printf("1 Debug: from_server FD = %d\n", from_server);
-  int r = read(from_server, buffer, sizeof(buffer));
+  //printf("1 Debug: from_server FD = %d\n", from_server);
+  int r = read(from_server, &rand_num, sizeof(int));
   if (r==-1) {
     perror("error client reading from private pipe");
     exit(1);
   }
-  printf("8. Client reading SYN_ACK from private pipe: %s\n", buffer);
+  printf("8. Client reading SYN_ACK from private pipe: %d\n", rand_num);
 
   remove(pipe_name);
   printf("8. Client removed private pipe: %s\n", pipe_name);
 
   //client sends ACK to server with WKP
-  w = write(*to_server, buffer, sizeof(buffer)+1);
+  int ack = rand_num+1;
+  w = write(*to_server, &ack, sizeof(int));
   if (w==-1) {
     perror("error client writing back to server");
     exit(1);
   }
-  printf("8. Client sent server ACK: %s\n", buffer);
-  free(buffer);
+  printf("8. Client sent server ACK: %d\n", ack);
+  //free(buffer);
 
   return from_server;
 }
